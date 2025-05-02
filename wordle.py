@@ -32,25 +32,84 @@ rules_btn = Button(root, text = "Got it!" ,
 
 rules_btn.grid(row=1, column=0, columnspan=7, pady=20, padx = 70)
 
+def on_key_press(event):
+        global guess
+        global attempt
+        global labels
+
+        key = event.keysym
+        char = event.char
+
+        if key == "BackSpace":
+            remove_letter()
+            guess = guess[:-1]
+            print(f"Backspace pressed, guess: {guess}")          # remove letter from guess
+        elif key == "Return":
+            if len(guess) == 5:
+                handle_guess()     # handle guess here
+            else:
+                print("Not enough letters")
+        elif char.isalpha() and len(guess) < 5:
+            guess += char
+            print(f"{attempt}: New guess: {guess}")        # update letter in Label
+            update_letter()
+
+def update_letter():
+    for i in range(len(guess)):
+        labels[attempt][i].config(text=guess[i].upper())
+
+def remove_letter():
+    labels[attempt][len(guess)-1].config(text="")
+
+def handle_row(guess):
+    global keyword
+    global attempt
+    global labels
+
+    for idx, letter in enumerate(guess):
+        if letter == keyword[idx]:        # green square (letter in keyword + letter in correct position)
+            labels[attempt][idx].config(bg="#538D4E")
+        elif letter in keyword:         # yellow square (letter in keyword but NOT in correct position)
+            labels[attempt][idx].config(bg="#B59F3B")
+        else:
+            labels[attempt][idx].config(bg="#3A3A3C")
+
+
+def handle_guess():
+    global attempt
+    global guess
+    handle_row(guess)
+
+    if guess == "hello":        # keyword here
+        print("Correct")
+    else:
+        attempt += 1        # increment attempt
+        guess = ""          # reset guess
+
 # game 
 def game():
+    global guess
+    global attempt
+    global labels
+    global keyword
 
+    guess = ""
     keyword = "hello"
+    attempt = 0
 
     grid_frame = Frame(root)
-    grid_frame.pack(expand=True)
+    grid_frame.pack(anchor='n', pady=50)
 
-    def handle_guess(event):
-        user_input = event.widget.get()
-        print(user_input)
-
+    labels = []     # store rows
     for j in range(6):
         row_entries = []
         for i, letter in enumerate(keyword):
-            letter_box = Entry(grid_frame, width=5, font=("Helvetica", 20), justify="center")
-            letter_box.grid(row=j, column=i, padx=2, pady=3)
+            letter_box = Label(grid_frame, width=1, height=1, font=("Franklin Gothic Medium", 32), justify="center", bg='#121213', fg='white', padx=16)
+            letter_box.grid(row=j, column=i, padx=3, pady=3)
             row_entries.append(letter_box)
-            letter_box.bind("<Return>", handle_guess)
+        labels.append(row_entries)      # add rows to labels
 
-
+    root.bind("<Key>", on_key_press)
+    root.focus_set()
+        
 root.mainloop()
