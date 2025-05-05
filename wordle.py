@@ -1,4 +1,5 @@
 from tkinter import *
+import random
 
 # Global variables for game state
 global guess, attempt, keyword, labels, btn_refs
@@ -15,13 +16,14 @@ def show_instructions():
         rules_btn.destroy()
         game()
 
-    rules = Label(root, text = """🎯 How to Play \n
+    rules_text = """🎯 How to Play \n
     You have 6 chances to crack the secret word! \n
     🟩 Green means the letter is correct and in the right spot. \n
     🟨 Yellow means the letter is in the word but in the wrong spot. \n
     ⬜️ Gray means the letter is not in the word at all. \n
-    Type your guesses and watch the colors guide your way to victory!""", 
-    font=("Helvetica", 16))
+    Type your guesses and watch the colors guide your way to victory!"""
+
+    rules = Label(root, text=rules_text, font=("Helvetica", 16), wraplength=450)
     rules.grid(row=0, column=0, columnspan=7, pady=(100, 10), padx = 70)
     # Instructions button
     rules_btn = Button(root, text = "Got it!" ,
@@ -38,6 +40,8 @@ def create_grid():
 
     grid_frame = Frame(root)
     grid_frame.pack(anchor='n', pady=50)
+
+    row_size = 5
 
     labels = []     # reset labels for rows
     for j in range(6):
@@ -154,16 +158,32 @@ def handle_guess():
         attempt += 1        # increment attempt
         guess = ""          # reset guess
 
+def get_keyword(word_file):
+    global keyword
+    with open(word_file, "r") as file:
+        lines = file.readlines()
+        line = random.choice(lines).strip()
+        return line
+
+
 # game function
 def game():
     global guess, attempt, keyword, labels, btn_refs
 
+    file_5 = "five-letter-words.txt"
+    file_6 = "six-letter-words.txt"
+
+    # current window size can fit up to 9 letters.
+
     # Reset variables
     guess = ""
     attempt = 0
-    keyword = "hello"           # change to dynamically pick from words.txt
+    keyword = get_keyword(file_6)     # change to dynamically pick from words.txt
     labels = []                 # store rows of letter Labels
     btn_refs = {}               # store btn references for on-screen keyboard
+
+    # debug
+    print(f"Keyword: {keyword}")
 
     # Create game grid + keyboard
     create_grid()
@@ -175,3 +195,8 @@ def game():
         
 show_instructions()
 root.mainloop()
+
+# next stage
+# on correct word, reset game and new word added. 
+# Reset board and grey out sections that were used last round? 
+# Or give at least two tries back?
