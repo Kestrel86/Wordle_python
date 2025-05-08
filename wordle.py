@@ -144,6 +144,26 @@ def update_keyboard(guess):
         else:
             btn_refs[letter].config(bg="#538D4E")
 
+def show_end_popup(message):
+    popup = Toplevel(root)
+    popup.title("Game Over")
+    popup.geometry("300x200")
+    popup.grab_set() 
+
+    Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
+
+    def quit_game():
+        root.destroy()
+
+    def restart_game():
+        popup.destroy()
+        for widget in root.winfo_children():
+            widget.destroy()
+        game()
+
+    Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="white").pack(pady=5)
+    Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="white").pack(pady=5)
+
 # Handle row guess
 def handle_guess():
     global guess, attempt, keyword
@@ -152,8 +172,10 @@ def handle_guess():
 
     if guess == keyword and attempt <= 5:
         print("You win!")           # TODO: end game (win)
+        show_end_popup("You Win")
     elif attempt == 5 and guess != keyword:
         print("You lose!")          # TODO: end game (lose)
+        show_end_popup("You lose!")
     else:
         attempt += 1        # increment attempt
         guess = ""          # reset guess
@@ -164,7 +186,6 @@ def get_keyword(word_file):
         lines = file.readlines()
         line = random.choice(lines).strip()
         return line
-
 
 # game function
 def game():
@@ -178,7 +199,7 @@ def game():
     # Reset variables
     guess = ""
     attempt = 0
-    keyword = get_keyword(file_6)     # change to dynamically pick from words.txt
+    keyword = get_keyword(file_5)     # change to dynamically pick from words.txt
     labels = []                 # store rows of letter Labels
     btn_refs = {}               # store btn references for on-screen keyboard
 
