@@ -144,13 +144,15 @@ def remove_letter():
 # Function to change color of row
 def handle_row(guess):
     global keyword, attempt, labels
-    for idx, letter in enumerate(guess):
-        if letter == keyword[idx]:              # green square (letter in keyword + letter in correct position)
-            labels[attempt][idx].config(bg="#538D4E")
-        elif letter in keyword:                 # yellow square (letter in keyword but NOT in correct position)
-            labels[attempt][idx].config(bg="#B59F3B")
-        else:                                   # not in keyword
-            labels[attempt][idx].config(bg="#3A3A3C")
+    # Don't update the row colors if the word is not valid
+    if guess in current_dictionary:
+        for idx, letter in enumerate(guess):
+            if letter == keyword[idx]:              # green square (letter in keyword + letter in correct position)
+                labels[attempt][idx].config(bg="#538D4E")
+            elif letter in keyword:                 # yellow square (letter in keyword but NOT in correct position)
+                labels[attempt][idx].config(bg="#B59F3B")
+            else:                                   # not in keyword
+                labels[attempt][idx].config(bg="#3A3A3C")
 
 # Function to change color of keyboard
 def update_keyboard(guess):
@@ -246,13 +248,12 @@ def get_keyword():
         return nine_letter_word_list[num]
         
 def start_round(increase=False):
-    """
-    If *increase* is True and we’re still below 9 letters,
-    bump the difficulty by one letter before resetting the UI.
-    """
+
     global keyword_length, current_dictionary
     global keyword, attempt, guess, labels, btn_refs
 
+    # If the player gets the word correct and the current word is less
+    # than 9 characters increase word length and clear the board
     if increase and keyword_length < 9:
         keyword_length += 1
     current_dictionary = length_to_dict[keyword_length]
