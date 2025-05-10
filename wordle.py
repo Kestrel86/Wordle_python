@@ -1,8 +1,17 @@
 from tkinter import *
 import random
+from dictionary import five_letter_word_list, six_letter_word_list, seven_letter_word_list, eight_letter_word_list, nine_letter_word_list
 
 # Global variables for game state
-global guess, attempt, keyword, labels, btn_refs
+global guess, attempt, keyword, labels, btn_refs, keyword_length, current_dictionary
+
+length_to_dict = {
+    5: five_letter_word_list,
+    6: six_letter_word_list,
+    7: seven_letter_word_list,
+    8: eight_letter_word_list,
+    9: nine_letter_word_list
+}
 
 # root window
 root = Tk()
@@ -34,12 +43,26 @@ def show_instructions():
                     height=2)
     rules_btn.grid(row=1, column=0, columnspan=7, pady=20, padx = 70)
 
+# A label to show messages to the user
+def create_status_label():
+    global status_label
+    status_label = Label(root,
+                         text="",
+                         font=("Helvetica", 20),
+                         fg="white")
+    status_label.pack(pady=(50,0))
+
+# Function to have the status label show only for a few seconds
+def show_message(msg, delay=3000):
+    status_label.config(text=msg)
+    root.after(delay, lambda: status_label.config(text=""))
+
 # Function to create guess grid
 def create_grid():
     global labels, keyword
 
     grid_frame = Frame(root)
-    grid_frame.pack(anchor='n', pady=50)
+    grid_frame.pack(anchor='n', pady=10)
 
     row_size = 5
 
@@ -77,23 +100,23 @@ def create_keyboard():
 
 # Event handling functions
 def on_key_press(event):
-        global guess, attempt, labels
-        key = event.keysym
-        char = event.char
+    global guess, attempt, labels
+    key = event.keysym
+    char = event.char
 
-        if key == "BackSpace":
-            remove_letter()
-            guess = guess[:-1]
-            print(f"Backspace pressed, guess: {guess}")
-        elif key == "Return":
-            if len(guess) == 5:
-                handle_guess()     # handle guess here
-            else:
-                print("Not enough letters")             # should display popup saying this
-        elif char.isalpha() and len(guess) < 5:
-            guess += char
-            print(f"{attempt}: New guess: {guess}")        # update letter in Label
-            update_letter()
+    if key == "BackSpace":
+        remove_letter()
+        guess = guess[:-1]
+        # print(f"Backspace pressed, guess: {guess}")
+    elif key == "Return":
+        if len(guess) == keyword_length:
+            handle_guess()     # handle guess here
+        else:
+            show_message("Not enough letters")
+            print("Not enough letters")             # should display popup saying this
+    elif char.isalpha() and len(guess) < keyword_length:
+        guess += char
+        update_letter()
 
 # Function to handle keyboard clicks
 def on_virtual_key_press(key):
@@ -170,52 +193,95 @@ def handle_guess():
     handle_row(guess)
     update_keyboard(guess)
 
-    if guess == keyword and attempt <= 5:
-        print("You win!")           # TODO: end game (win)
-        show_end_popup("You Win")
-    elif attempt == 5 and guess != keyword:
-        print("You lose!")          # TODO: end game (lose)
-        show_end_popup("You lose!")
-    else:
-        attempt += 1        # increment attempt
-        guess = ""          # reset guess
+    attempts_left = True
 
-def get_keyword(word_file):
-    global keyword
-    with open(word_file, "r") as file:
-        lines = file.readlines()
-        line = random.choice(lines).strip()
-        return line
+    if attempt == 5:
+        attempts_left = False
+
+    if guess == keyword and attempt != 5:
+        attempt += 1
+
+        # Start the next round and increase the word length
+        start_round(increase=attempts_left)
+        return
+    
+    elif guess == keyword and attempt == 5:
+        show_end_popup(f"You solved it!")
+
+    elif guess not in current_dictionary:
+        show_message("Not in word list")
+
+    elif attempt >= 5 and guess != keyword:
+        show_end_popup(f"You lose!\nThe word was {keyword.upper()}")
+
+    elif guess == keyword and keyword_length == 9:
+        show_end_popup("You Win")
+
+    else:
+        print(f"{attempt}: New guess: {guess}") 
+        attempt += 1
+        guess = ""
+
+def get_keyword():
+    global keyword, keyword_length
+    if keyword_length == 5:
+        length = len(five_letter_word_list)
+        num = random.randint(0, length)
+        return five_letter_word_list[num]
+    elif keyword_length == 6:
+        length = len(six_letter_word_list)
+        num = random.randint(0, length)
+        return six_letter_word_list[num]
+    elif keyword_length == 7:
+        length = len(seven_letter_word_list)
+        num = random.randint(0, length)
+        return seven_letter_word_list[num]
+    elif keyword_length == 8:
+        length = len(eight_letter_word_list)
+        num = random.randint(0, length)
+        return eight_letter_word_list[num]
+    elif keyword_length == 9:
+        length = len(nine_letter_word_list)
+        num = random.randint(0, length)
+        return nine_letter_word_list[num]
+        
+def start_round(increase=False):
+    """
+    If *increase* is True and we’re still below 9 letters,
+    bump the difficulty by one letter before resetting the UI.
+    """
+    global keyword_length, current_dictionary
+    global keyword, attempt, guess, labels, btn_refs
+
+    if increase and keyword_length < 9:
+        keyword_length += 1
+    current_dictionary = length_to_dict[keyword_length]
+
+    keyword = get_keyword()
+    print(keyword)
+    guess   = ""
+    labels  = []
+    btn_refs = {}
+
+    for widget in root.winfo_children():
+        widget.destroy()
+    create_status_label()
+    create_grid()
+    create_keyboard()
+    root.focus_set()
 
 # game function
 def game():
-    global guess, attempt, keyword, labels, btn_refs
-
-    file_5 = "five-letter-words.txt"
-    file_6 = "six-letter-words.txt"
-
-    # current window size can fit up to 9 letters.
-
-    # Reset variables
-    guess = ""
+    global keyword_length, attempt
     attempt = 0
-    keyword = get_keyword(file_5)     # change to dynamically pick from words.txt
-    labels = []                 # store rows of letter Labels
-    btn_refs = {}               # store btn references for on-screen keyboard
-
-    # debug
-    print(f"Keyword: {keyword}")
-
-    # Create game grid + keyboard
-    create_grid()
-    create_keyboard()
-
-    # Bind keyboard events for player input
     root.bind("<Key>", on_key_press)
     root.focus_set()
+    keyword_length = 5          # first round is always 5 letters
+    start_round()               
         
 show_instructions()
 root.mainloop()
+
 
 # next stage
 # on correct word, reset game and new word added. 
