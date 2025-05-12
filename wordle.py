@@ -1,6 +1,7 @@
 from tkinter import *
 import random
 from dictionary import five_letter_word_list, six_letter_word_list, seven_letter_word_list, eight_letter_word_list, nine_letter_word_list
+from collections import Counter
 
 # Global variables for game state
 global guess, attempt, keyword, labels, btn_refs, keyword_length, current_dictionary
@@ -146,13 +147,22 @@ def handle_row(guess):
     global keyword, attempt, labels
     # Don't update the row colors if the word is not valid
     if guess in current_dictionary:
+        keyword_letter_counts = Counter(keyword) # counter object creates a dictionary of letters as key and the count of each letter as values
+        used_counts = Counter() # counter object for the user's guess
+        
         for idx, letter in enumerate(guess):
-            if letter == keyword[idx]:              # green square (letter in keyword + letter in correct position)
+            if letter == keyword[idx]:   # green square (letter in keyword + letter in correct position)
                 labels[attempt][idx].config(bg="#538D4E")
-            elif letter in keyword:                 # yellow square (letter in keyword but NOT in correct position)
-                labels[attempt][idx].config(bg="#B59F3B")
-            else:                                   # not in keyword
-                labels[attempt][idx].config(bg="#3A3A3C")
+                used_counts[letter] += 1  # will keep track of the letter count from the user's guess  
+            else:                                   
+                labels[attempt][idx].config(bg="#3A3A3C") # not in keyword
+        
+        for idx, letter in enumerate(guess):
+            if letter != keyword[idx] and letter in keyword: 
+                if used_counts[letter] < keyword_letter_counts[letter]:
+                    labels[attempt][idx].config(bg="#B59F3B") # yellow square (letter in keyword but NOT in correct position)
+                    used_counts[letter] += 1
+                
 
 # Function to change color of keyboard
 def update_keyboard(guess):
@@ -186,8 +196,8 @@ def show_end_popup(message):
             widget.destroy()
         game()
 
-    Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="white").pack(pady=5)
-    Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="white").pack(pady=5)
+    Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+    Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
 
 # Handle row guess
 def handle_guess():
