@@ -77,9 +77,11 @@ def show_message(msg, delay=3000):
     status_label.config(text=msg)
     root.after(delay, lambda: status_label.config(text=""))
 
-def show_definition(msg, delay=8000):
-    definition_label.config(text=msg)
-    root.after(delay, lambda: definition_label.config(text=""))
+def show_definition(msg):
+    if msg:
+        definition_label.config(text=msg)
+    else:
+        definition_label.config(text="No definition found.")
 
 # Function to create guess grid
 def create_grid(size=6, winning_row=False):
@@ -256,6 +258,8 @@ def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=Fals
 
     def restart_game():
         global row_size
+        # Clear the definition when player hits continue
+        definition_label.config(text="")
         if game_end == 1:
             popup.destroy()
             start_round(increase=attempts_left, size=row_size-attempt, winning_row=winning_row)
