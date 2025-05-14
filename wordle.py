@@ -189,8 +189,6 @@ def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
     popup.geometry("300x200")
     popup.grab_set() 
 
-    Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
-
     def quit_game():
         root.destroy()
 
@@ -207,15 +205,21 @@ def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
         global keyword_length
         keyword_length = 5
         popup.destroy()
+        root.bind("<Key>", on_key_press)
         start_round(increase = False, size = 6, winning_row = False)
         
-    if keyword_length == 9:
-        Button(popup, text="Restart Game (Back to 5 letter words)", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-        Button(popup, text = "Continue (With 9 letter words)", command = play_again, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-        Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
-    else: 
-        Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-        Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+        if keyword_length == 9:
+            popup.geometry("350x250")
+            Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
+
+            Button(popup, text="Restart Game (Back to 5 letter words)", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+            Button(popup, text = "Continue (With 9 letter words)", command = play_again, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+            Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+        else: 
+            Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
+
+            Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+            Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
 
 def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=False):
     popup = Toplevel(root)
@@ -237,6 +241,7 @@ def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=Fals
             popup.destroy()
             start_round()
 
+    popup.bind("<Return>", lambda event: restart_game())
     Button(popup, text="Continue", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
     Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
 
@@ -252,6 +257,7 @@ def handle_guess():
         attempts_left = False
 
     if guess == keyword and attempt != row_size-1:
+        guess = ""
         attempt += 1
 
         # Start the next round and increase the word length
