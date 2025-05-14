@@ -184,34 +184,17 @@ def update_keyboard(guess):
 
 def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
     popup = Toplevel(root)
-    popup.title("Game Over")
+    popup.title("Game")
     popup.geometry("300x200")
     popup.grab_set() 
+    
 
     Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
 
     def quit_game():
         root.destroy()
 
-    def restart_game():
-        popup.destroy()
-        game()
-
-    Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-    Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
-
-def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=False):
-    popup = Toplevel(root)
-    popup.title("Game Over")
-    popup.geometry("300x200")
-    popup.grab_set() 
-
-    Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
-
-    def quit_game():
-        root.destroy()
-
-    def restart_game():
+    def play_again():
         global row_size
         if game_end == 1:
             popup.destroy()
@@ -219,9 +202,24 @@ def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=Fals
         else:
             popup.destroy()
             start_round()
+    
+    def restart_game():
+        global keyword_length
+        keyword_length = 5
+        popup.destroy()
+        start_round(increase = False, size = 6, winning_row = False)
+        
 
-    Button(popup, text="Continue", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-    Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+    
+    if keyword_length == 9:
+        Button(popup, text="Restart Game (Back to 5 letter words)", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+        Button(popup, text = "Continue (With 9 letter words)", command = play_again, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+        Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+    else:
+        Button(popup, text="Play Again", command=play_again, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+        Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+        
+    
 
 # Handle row guess
 def handle_guess():
@@ -273,23 +271,29 @@ def get_keyword():
     if keyword_length == 5:
         length = len(five_letter_word_list)
         num = random.randint(0, length)
-        return five_letter_word_list[num]
+        #return five_letter_word_list[num]
+        return "hello"
     elif keyword_length == 6:
         length = len(six_letter_word_list)
         num = random.randint(0, length)
-        return six_letter_word_list[num]
+        #return six_letter_word_list[num]
+        return "places"
     elif keyword_length == 7:
         length = len(seven_letter_word_list)
         num = random.randint(0, length)
-        return seven_letter_word_list[num]
+        #return seven_letter_word_list[num]
+        return "classic"
     elif keyword_length == 8:
         length = len(eight_letter_word_list)
         num = random.randint(0, length)
-        return eight_letter_word_list[num]
+        #return eight_letter_word_list[num]
+        return "shoulder"
     elif keyword_length == 9:
         length = len(nine_letter_word_list)
         num = random.randint(0, length)
-        return nine_letter_word_list[num]
+        #return nine_letter_word_list[num]
+        return "shoulders"
+        
         
 def start_round(increase=False, size=6, winning_row=False):
 
