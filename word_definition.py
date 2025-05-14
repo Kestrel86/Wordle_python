@@ -17,5 +17,3 @@ def lookup_word(word):
     except Exception as e:
         print(f"Error looking up word: {e}")
         return None
-    
-print(lookup_word('zucchetto'))
