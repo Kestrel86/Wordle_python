@@ -59,7 +59,7 @@ def show_message(msg, delay=3000):
     root.after(delay, lambda: status_label.config(text=""))
 
 # Function to create guess grid
-def create_grid(size=6, winning_row=None):
+def create_grid(size=6, winning_row=False):
     global labels, keyword, row_size
 
     grid_frame = Frame(root)
@@ -67,6 +67,9 @@ def create_grid(size=6, winning_row=None):
 
     row_size = max(2, size)
     labels = []     # reset labels for rows
+
+    if winning_row == True:
+        row_size += 1
 
     for j in range(row_size):
         row_entries = []
@@ -179,7 +182,7 @@ def update_keyboard(guess):
         else:
             btn_refs[letter].config(bg="#538D4E")
 
-def show_end_popup(message, game_end=0,attempts_left=True):
+def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
     popup = Toplevel(root)
     popup.title("Game Over")
     popup.geometry("300x200")
@@ -194,7 +197,7 @@ def show_end_popup(message, game_end=0,attempts_left=True):
         global row_size
         if game_end == 1:
             popup.destroy()
-            start_round(increase=attempts_left, size=row_size-attempt)
+            start_round(increase=attempts_left, size=row_size-attempt, winning_row=winning_row)
         else:
             popup.destroy()
             start_round()
@@ -217,7 +220,7 @@ def handle_guess():
         attempt += 1
 
         # Start the next round and increase the word length
-        show_end_popup(f"You Win! Next Round?", game_end=1, attempts_left=attempts_left)
+        show_end_popup(f"You Win! Next Round?", game_end=1, attempts_left=attempts_left,winning_row=True)
         # start_round(increase=attempts_left)
         return
     
@@ -261,7 +264,7 @@ def get_keyword():
         num = random.randint(0, length)
         return nine_letter_word_list[num]
         
-def start_round(increase=False, size=6):
+def start_round(increase=False, size=6, winning_row=False):
 
     global keyword_length, current_dictionary
     global keyword, attempt, guess, labels, btn_refs
@@ -282,7 +285,7 @@ def start_round(increase=False, size=6):
     for widget in root.winfo_children():
         widget.destroy()
     create_status_label()
-    create_grid(size)
+    create_grid(size,winning_row=winning_row)
     create_keyboard()
     root.focus_set()
 
