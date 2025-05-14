@@ -4,7 +4,7 @@ from dictionary import five_letter_word_list, six_letter_word_list, seven_letter
 from collections import Counter
 
 # Global variables for game state
-global guess, attempt, keyword, labels, btn_refs, keyword_length, current_dictionary
+global guess, attempt, keyword, labels, btn_refs, keyword_length, current_dictionary, row_size
 
 length_to_dict = {
     5: five_letter_word_list,
@@ -59,16 +59,16 @@ def show_message(msg, delay=3000):
     root.after(delay, lambda: status_label.config(text=""))
 
 # Function to create guess grid
-def create_grid():
-    global labels, keyword
+def create_grid(size=6, winning_row=None):
+    global labels, keyword, row_size
 
     grid_frame = Frame(root)
     grid_frame.pack(anchor='n', pady=10)
 
-    row_size = 5
-
+    row_size = max(2, size)
     labels = []     # reset labels for rows
-    for j in range(6):
+
+    for j in range(row_size):
         row_entries = []
         for i, letter in enumerate(keyword):
             letter_box = Label(grid_frame, width=1, font=("Franklin Gothic Medium", 32), justify="center", bg="#121213", fg="white", padx=16)
@@ -85,7 +85,7 @@ def create_keyboard():
         ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
     ]
     keyboard_frame = Frame(root)
-    keyboard_frame.pack()
+    keyboard_frame.pack(side="bottom", pady=20, expand=False, fill='x') # keeps it at the bottom of the window
 
     for row in keyboard_rows:
         row_frame = Frame(keyboard_frame)
@@ -179,7 +179,7 @@ def update_keyboard(guess):
         else:
             btn_refs[letter].config(bg="#538D4E")
 
-def show_end_popup(message):
+def show_end_popup(message, game_end=0,attempts_left=True):
     popup = Toplevel(root)
     popup.title("Game Over")
     popup.geometry("300x200")
@@ -191,17 +191,20 @@ def show_end_popup(message):
         root.destroy()
 
     def restart_game():
-        popup.destroy()
-        for widget in root.winfo_children():
-            widget.destroy()
-        game()
+        global row_size
+        if game_end == 1:
+            popup.destroy()
+            start_round(increase=attempts_left, size=row_size-attempt)
+        else:
+            popup.destroy()
+            start_round()
 
     Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
     Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
 
 # Handle row guess
 def handle_guess():
-    global guess, attempt, keyword
+    global guess, attempt, keyword, row_size
     handle_row(guess)
     update_keyboard(guess)
 
@@ -210,20 +213,21 @@ def handle_guess():
     if attempt == 5:
         attempts_left = False
 
-    if guess == keyword and attempt != 5:
+    if guess == keyword and attempt != row_size-1:
         attempt += 1
 
         # Start the next round and increase the word length
-        start_round(increase=attempts_left)
+        show_end_popup(f"You Win! Next Round?", game_end=1, attempts_left=attempts_left)
+        # start_round(increase=attempts_left)
         return
     
-    elif guess == keyword and attempt == 5:
+    elif guess == keyword and attempt == row_size-1:
         show_end_popup(f"You solved it!")
 
     elif guess not in current_dictionary:
         show_message("Not in word list")
 
-    elif attempt >= 5 and guess != keyword:
+    elif attempt >= row_size-1 and guess != keyword:
         show_end_popup(f"You lose!\nThe word was {keyword.upper()}")
 
     elif guess == keyword and keyword_length == 9:
@@ -257,7 +261,7 @@ def get_keyword():
         num = random.randint(0, length)
         return nine_letter_word_list[num]
         
-def start_round(increase=False):
+def start_round(increase=False, size=6):
 
     global keyword_length, current_dictionary
     global keyword, attempt, guess, labels, btn_refs
@@ -273,11 +277,12 @@ def start_round(increase=False):
     guess   = ""
     labels  = []
     btn_refs = {}
+    attempt = 0
 
     for widget in root.winfo_children():
         widget.destroy()
     create_status_label()
-    create_grid()
+    create_grid(size)
     create_keyboard()
     root.focus_set()
 
