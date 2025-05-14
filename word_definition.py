@@ -11,7 +11,8 @@ def lookup_word(word):
         wordrange = (0, len(word))
         definition = DictionaryServices.DCSCopyTextDefinition(None, word, wordrange)
         if definition:
-            return definition
+            short_def = definition.split('.')[0] + '.'
+            return short_def
         else:
             return None
     except Exception as e:
