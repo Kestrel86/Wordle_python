@@ -205,21 +205,20 @@ def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
         global keyword_length
         keyword_length = 5
         popup.destroy()
-        root.bind("<Key>", on_key_press)
         start_round(increase = False, size = 6, winning_row = False)
         
-        if keyword_length == 9:
-            popup.geometry("350x250")
-            Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
+    if keyword_length == 9:
+        popup.geometry("350x250")
+        Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
 
-            Button(popup, text="Restart Game (Back to 5 letter words)", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-            Button(popup, text = "Continue (With 9 letter words)", command = play_again, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-            Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
-        else: 
-            Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
+        Button(popup, text="Restart Game (Back to 5 letter words)", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+        Button(popup, text = "Continue (With 9 letter words)", command = play_again, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+        Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+    else: 
+        Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
 
-            Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
-            Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+        Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+        Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
 
 def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=False):
     popup = Toplevel(root)
