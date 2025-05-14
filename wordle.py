@@ -31,7 +31,8 @@ def show_instructions():
     🟩 Green means the letter is correct and in the right spot. \n
     🟨 Yellow means the letter is in the word but in the wrong spot. \n
     ⬜️ Gray means the letter is not in the word at all. \n
-    Type your guesses and watch the colors guide your way to victory!"""
+    Once you guess the correct word, the word length increases by 1, and you get 1 additional chance to solve the next word! \n
+    Continue solving the increasing word lengths and challenges to achieve victory!"""
 
     rules = Label(root, text=rules_text, font=("Helvetica", 16), wraplength=450)
     rules.grid(row=0, column=0, columnspan=7, pady=(100, 10), padx = 70)
@@ -289,28 +290,23 @@ def get_keyword():
     if keyword_length == 5:
         length = len(five_letter_word_list)
         num = random.randint(0, length)
-        #return five_letter_word_list[num]
-        return "hello"
+        return five_letter_word_list[num]
     elif keyword_length == 6:
         length = len(six_letter_word_list)
         num = random.randint(0, length)
-        #return six_letter_word_list[num]
-        return "places"
+        return six_letter_word_list[num]
     elif keyword_length == 7:
         length = len(seven_letter_word_list)
         num = random.randint(0, length)
-        #return seven_letter_word_list[num]
-        return "classic"
+        return seven_letter_word_list[num]
     elif keyword_length == 8:
         length = len(eight_letter_word_list)
         num = random.randint(0, length)
-        #return eight_letter_word_list[num]
-        return "shoulder"
+        return eight_letter_word_list[num]
     elif keyword_length == 9:
         length = len(nine_letter_word_list)
         num = random.randint(0, length)
-        #return nine_letter_word_list[num]
-        return "shoulders"
+        return nine_letter_word_list[num]
         
 def start_round(increase=False, size=6, winning_row=False):
 
