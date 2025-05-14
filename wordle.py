@@ -6,6 +6,7 @@ from tkinter import *
 import random
 from dictionary import five_letter_word_list, six_letter_word_list, seven_letter_word_list, eight_letter_word_list, nine_letter_word_list
 from collections import Counter
+from word_definition import lookup_word
 
 # Global variables for game state
 global guess, attempt, keyword, labels, btn_refs, keyword_length, current_dictionary, row_size
@@ -58,10 +59,27 @@ def create_status_label():
                          fg="white")
     status_label.pack(pady=(50,0))
 
+# A label to show messages to the user
+def create_definition_label():
+    global definition_label
+    definition_label = Label(root,
+                         text="",
+                         font=("Helvetica", 20),
+                         fg="white",
+                         wraplength=500,
+                         justify=LEFT,
+                         padx=10,
+                         pady=10)
+    definition_label.pack(pady=(50,0), padx=(20,20))
+
 # Function to have the status label show only for a few seconds
 def show_message(msg, delay=3000):
     status_label.config(text=msg)
     root.after(delay, lambda: status_label.config(text=""))
+
+def show_definition(msg, delay=8000):
+    definition_label.config(text=msg)
+    root.after(delay, lambda: definition_label.config(text=""))
 
 # Function to create guess grid
 def create_grid(size=6, winning_row=False):
@@ -264,6 +282,9 @@ def handle_guess():
         guess = ""
         attempt += 1
 
+        # Show the keyword definition
+        show_definition(lookup_word(keyword))
+
         # Start the next round and increase the word length
         if len(keyword) == 5:
             show_continue_popup(f"First Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
@@ -297,22 +318,32 @@ def get_keyword():
     if keyword_length == 5:
         length = len(five_letter_word_list)
         num = random.randint(0, length)
+        while lookup_word(five_letter_word_list[num]) == None:
+            num = random.randint(0,length)
         return five_letter_word_list[num]
     elif keyword_length == 6:
         length = len(six_letter_word_list)
         num = random.randint(0, length)
+        while lookup_word(six_letter_word_list[num]) == None:
+            num = random.randint(0,length)
         return six_letter_word_list[num]
     elif keyword_length == 7:
         length = len(seven_letter_word_list)
         num = random.randint(0, length)
+        while lookup_word(seven_letter_word_list[num]) == None:
+            num = random.randint(0,length)
         return seven_letter_word_list[num]
     elif keyword_length == 8:
         length = len(eight_letter_word_list)
         num = random.randint(0, length)
+        while lookup_word(eight_letter_word_list[num]) == None:
+            num = random.randint(0,length)
         return eight_letter_word_list[num]
     elif keyword_length == 9:
         length = len(nine_letter_word_list)
         num = random.randint(0, length)
+        while lookup_word(nine_letter_word_list[num]) == None:
+            num = random.randint(0,length)
         return nine_letter_word_list[num]
         
 def start_round(increase=False, size=6, winning_row=False):
@@ -337,6 +368,7 @@ def start_round(increase=False, size=6, winning_row=False):
         widget.destroy()
     create_status_label()
     create_grid(size,winning_row=winning_row)
+    create_definition_label()
     create_keyboard()
     root.focus_set()
 
