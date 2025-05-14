@@ -114,11 +114,12 @@ def on_key_press(event):
         guess = guess[:-1]
         # print(f"Backspace pressed, guess: {guess}")
     elif key == "Return":
-        if len(guess) == keyword_length:
-            handle_guess()     # handle guess here
+        if len(guess) == keyword_length and guess in current_dictionary:
+            handle_guess()     # handle VALID guess here
+        elif guess not in current_dictionary and len(guess) == keyword_length:
+            show_message("Not in word list") 
         else:
             show_message("Not enough letters")
-            print("Not enough letters")             # should display popup saying this
     elif char.isalpha() and len(guess) < keyword_length:
         guess += char
         update_letter()
@@ -176,7 +177,7 @@ def update_keyboard(guess):
         bg_color = label.cget('bg')
         btn_prev_color = btn_refs[letter].cget('bg')
         
-        if bg_color == "#3A3A3C":
+        if bg_color == "#3A3A3C" or bg_color == "#121213":
             btn_refs[letter].config(bg="#3A3A3C")
         elif bg_color == "#B59F3B" and btn_prev_color != "#538D4E":
             btn_refs[letter].config(bg="#B59F3B")
@@ -247,7 +248,7 @@ def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=Fals
 # Handle row guess
 def handle_guess():
     global guess, attempt, keyword, row_size
-    handle_row(guess)
+    handle_row(guess)               # change row color
     update_keyboard(guess)
 
     attempts_left = True
@@ -273,11 +274,8 @@ def handle_guess():
             show_end_popup(f"Final Round Complete! Play again?", game_end=0, attempts_left=5,winning_row=False)
         return
     
-    elif guess == keyword and attempt == row_size-1:
-        show_end_popup(f"You solved it!")
-
-    elif guess not in current_dictionary:
-        show_message("Not in word list")
+    # elif guess == keyword and attempt == row_size-1:
+    #     show_end_popup(f"You solved it!")
 
     elif attempt >= row_size-1 and guess != keyword:
         show_end_popup(f"You lose!\nThe word was {keyword.upper()}")
