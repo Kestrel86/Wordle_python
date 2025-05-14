@@ -1,3 +1,7 @@
+# How to Run
+# While in the folder of Wordle_python,
+# Run the command: python wordle.py
+
 from tkinter import *
 import random
 from dictionary import five_letter_word_list, six_letter_word_list, seven_letter_word_list, eight_letter_word_list, nine_letter_word_list
