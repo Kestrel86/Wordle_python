@@ -279,32 +279,14 @@ def handle_guess():
 
     attempts_left = True
 
-    if attempt == 5:
-        attempts_left = False
-
-    if guess == keyword and attempt != row_size-1:
+    if guess == keyword:
         guess = ""
-        attempt += 1
+        # attempt += 1
 
-        # Show the keyword definition
-        show_definition(lookup_word(keyword))
-
-        # Start the next round and increase the word length
-        if len(keyword) == 5:
-            show_continue_popup(f"First Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
-        # start_round(increase=attempts_left)
-        elif len(keyword) == 6:
-            show_continue_popup(f"Second Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
-        elif len(keyword) == 7:
-            show_continue_popup(f"Third Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
-        elif len(keyword) == 8:
-            show_continue_popup(f"Fourth Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
-        elif len(keyword) == 9:
-            show_end_popup(f"Final Round Complete! Play again?", game_end=0, attempts_left=5,winning_row=False)
-        return
-    
-    # elif guess == keyword and attempt == row_size-1:
-    #     show_end_popup(f"You solved it!")
+        if len(keyword) != 9:
+            show_continue_popup("Round Complete! Continue to next round?", game_end=1, attempts_left=attempts_left, winning_row=False)
+        else:
+            show_end_popup("You finished!")
 
     elif attempt >= row_size-1 and guess != keyword:
         show_end_popup(f"You lose!\nThe word was {keyword.upper()}")
