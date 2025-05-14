@@ -194,6 +194,24 @@ def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
         root.destroy()
 
     def restart_game():
+        popup.destroy()
+        game()
+
+    Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+    Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
+
+def show_continue_popup(message, game_end=0,attempts_left=True, winning_row=False):
+    popup = Toplevel(root)
+    popup.title("Game Over")
+    popup.geometry("300x200")
+    popup.grab_set() 
+
+    Label(popup, text=message, font=("Helvetica", 16), wraplength=250, pady=20).pack()
+
+    def quit_game():
+        root.destroy()
+
+    def restart_game():
         global row_size
         if game_end == 1:
             popup.destroy()
@@ -202,7 +220,7 @@ def show_end_popup(message, game_end=0,attempts_left=True, winning_row=False):
             popup.destroy()
             start_round()
 
-    Button(popup, text="Play Again", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
+    Button(popup, text="Continue", command=restart_game, font=("Helvetica", 14), bg="green", fg="black").pack(pady=5)
     Button(popup, text="Quit", command=quit_game, font=("Helvetica", 14), bg="red", fg="black").pack(pady=5)
 
 # Handle row guess
@@ -220,8 +238,17 @@ def handle_guess():
         attempt += 1
 
         # Start the next round and increase the word length
-        show_end_popup(f"You Win! Next Round?", game_end=1, attempts_left=attempts_left,winning_row=True)
+        if len(keyword) == 5:
+            show_continue_popup(f"First Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
         # start_round(increase=attempts_left)
+        elif len(keyword) == 6:
+            show_continue_popup(f"Second Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
+        elif len(keyword) == 7:
+            show_continue_popup(f"Third Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
+        elif len(keyword) == 8:
+            show_continue_popup(f"Fourth Round Complete! Continue?", game_end=1, attempts_left=attempts_left,winning_row=True)
+        elif len(keyword) == 9:
+            show_end_popup(f"Final Round Complete! Play again?", game_end=0, attempts_left=5,winning_row=False)
         return
     
     elif guess == keyword and attempt == row_size-1:
