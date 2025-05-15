@@ -18,6 +18,7 @@ def get_os():
         return 'other'
     
 current_os = get_os()
+current_os = 'other'
 
 if current_os == 'macOS':
     from word_definition import lookup_word
@@ -154,12 +155,20 @@ def on_key_press(event):
         guess = guess[:-1]
         # print(f"Backspace pressed, guess: {guess}")
     elif key == "Return":
-        if len(guess) == keyword_length and guess in current_dictionary:
-            handle_guess()     # handle VALID guess here
-        elif guess not in current_dictionary and len(guess) == keyword_length:
-            show_message("Not in word list") 
+        if current_os == 'macOS':
+            if len(guess) == keyword_length and lookup_word(guess) != None:
+                handle_guess()     # handle VALID guess here
+            elif lookup_word(guess) == None and len(guess) == keyword_length:
+                show_message("Not in word list") 
+            else:
+                show_message("Not enough letters")
         else:
-            show_message("Not enough letters")
+            if len(guess) == keyword_length and guess in current_dictionary:
+                handle_guess()     # handle VALID guess here
+            elif guess not in current_dictionary and len(guess) == keyword_length:
+                show_message("Not in word list") 
+            else:
+                show_message("Not enough letters")
     elif char.isalpha() and len(guess) < keyword_length:
         guess += char
         update_letter()
@@ -190,23 +199,40 @@ def remove_letter():
 # Function to change color of row
 def handle_row(guess):
     global keyword, attempt, labels
-    # Don't update the row colors if the word is not valid
-    if guess in current_dictionary:
-        keyword_letter_counts = Counter(keyword) # counter object creates a dictionary of letters as key and the count of each letter as values
-        used_counts = Counter() # counter object for the user's guess
+    valid_word = False
+    keyword_letter_counts = None
+    used_counts = None
+
+    # validate the word based on OS
+    if current_os == 'macOS':
+        if lookup_word(guess) is not None or guess in current_dictionary:
+            valid_word = True
         
+    else:
+        if guess in current_dictionary:
+            valid_word = True
+
+    if valid_word:
+        keyword_letter_counts = Counter(keyword)
+        used_counts = Counter()
+
+        # mark green squares
         for idx, letter in enumerate(guess):
-            if letter == keyword[idx]:   # green square (letter in keyword + letter in correct position)
+            if letter == keyword[idx]: # green square (letter in correct pos)
                 labels[attempt][idx].config(bg="#538D4E")
-                used_counts[letter] += 1  # will keep track of the letter count from the user's guess  
-            else:                                   
-                labels[attempt][idx].config(bg="#3A3A3C") # not in keyword
+                used_counts[letter] += 1 # track used letters
+            else:
+                labels[attempt][idx].config(bg="#3A3A3C") # initially mark as not in word
         
         for idx, letter in enumerate(guess):
-            if letter != keyword[idx] and letter in keyword: 
+            if letter != keyword[idx] and letter in keyword:
                 if used_counts[letter] < keyword_letter_counts[letter]:
-                    labels[attempt][idx].config(bg="#B59F3B") # yellow square (letter in keyword but NOT in correct position)
+                    labels[attempt][idx].config(bg="#B59F3B") # yellow square (letter in wrong pos)
                     used_counts[letter] += 1
+
+        return True # valid word and colors applied
+    
+    return False # word not valid
                 
 
 # Function to change color of keyboard
