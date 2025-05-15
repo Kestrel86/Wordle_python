@@ -6,10 +6,21 @@ from tkinter import *
 import random
 from dictionary import five_letter_word_list, six_letter_word_list, seven_letter_word_list, eight_letter_word_list, nine_letter_word_list
 from collections import Counter
-from word_definition import lookup_word
+import sys
 
 # Global variables for game state
 global guess, attempt, keyword, labels, btn_refs, keyword_length, current_dictionary, row_size
+
+def get_os():
+    if sys.platform.startswith('darwin'):
+        return 'macOS'
+    else:
+        return 'other'
+    
+current_os = get_os()
+
+if current_os == 'macOS':
+    from word_definition import lookup_word
 
 length_to_dict = {
     5: five_letter_word_list,
@@ -283,6 +294,9 @@ def handle_guess():
         guess = ""
         # attempt += 1
 
+        if current_os == 'macOS':
+            show_definition(lookup_word(keyword))
+
         if len(keyword) != 9:
             show_continue_popup("Round Complete! Continue to next round?", game_end=1, attempts_left=attempts_left, winning_row=False)
         else:
@@ -304,32 +318,22 @@ def get_keyword():
     if keyword_length == 5:
         length = len(five_letter_word_list)
         num = random.randint(0, length)
-        while lookup_word(five_letter_word_list[num]) == None:
-            num = random.randint(0,length)
         return five_letter_word_list[num]
     elif keyword_length == 6:
         length = len(six_letter_word_list)
         num = random.randint(0, length)
-        while lookup_word(six_letter_word_list[num]) == None:
-            num = random.randint(0,length)
         return six_letter_word_list[num]
     elif keyword_length == 7:
         length = len(seven_letter_word_list)
         num = random.randint(0, length)
-        while lookup_word(seven_letter_word_list[num]) == None:
-            num = random.randint(0,length)
         return seven_letter_word_list[num]
     elif keyword_length == 8:
         length = len(eight_letter_word_list)
         num = random.randint(0, length)
-        while lookup_word(eight_letter_word_list[num]) == None:
-            num = random.randint(0,length)
         return eight_letter_word_list[num]
     elif keyword_length == 9:
         length = len(nine_letter_word_list)
         num = random.randint(0, length)
-        while lookup_word(nine_letter_word_list[num]) == None:
-            num = random.randint(0,length)
         return nine_letter_word_list[num]
         
 def start_round(increase=False, size=6, winning_row=False):
