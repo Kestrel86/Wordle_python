@@ -130,10 +130,15 @@ def create_keyboard():
         row_frame = Frame(keyboard_frame)
         row_frame.pack()
         for key in row:
-            btn_width = 6 if key == "ENTER" else 4 if key == "⌫" else 3
+            if current_os == 'macOS':   # mac settings
+                btn_width = 4 if key == "ENTER" else 2 if key == "⌫" else 1
+                font_size = 24
+            else:   # windows settings
+                btn_width = 6 if key == "ENTER" else 4 if key == "⌫" else 3
+                font_size = 18
             btn = Button(
-                row_frame, text=key, width=btn_width, height=1, font=("Franklin Gothic Medium", 18), cursor="hand2",
-                bg="#818384", fg="white", command=lambda k=key: on_virtual_key_press(k)
+                row_frame, text=key, width=btn_width, height=1, font=("Franklin Gothic Medium", font_size), cursor="hand2",
+                bg="#818384", fg="white" if current_os != 'macOS' else None, command=lambda k=key: on_virtual_key_press(k)
             )
             btn.pack(side="left", padx=2, pady=2)
             btn_refs[key.lower()] = btn         # store btn reference
@@ -309,7 +314,7 @@ def handle_guess():
         show_end_popup("You Win")
 
     else:
-        print(f"{attempt}: New guess: {guess}") 
+        print(f"{attempt}: Guess: {guess}") 
         attempt += 1
         guess = ""
 
