@@ -18,7 +18,6 @@ def get_os():
         return 'other'
     
 current_os = get_os()
-current_os = 'other'
 
 if current_os == 'macOS':
     from word_definition import lookup_word
