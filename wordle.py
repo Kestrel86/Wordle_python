@@ -21,6 +21,9 @@ current_os = get_os()
 
 if current_os == 'macOS':
     from word_definition import lookup_word
+    from tkmacosx import Button as KeyButton
+else:
+    KeyButton = Button
 
 length_to_dict = {
     5: five_letter_word_list,
@@ -101,7 +104,7 @@ def create_grid(size=6, winning_row=False):
     grid_frame = Frame(root)
     grid_frame.pack(anchor='n', pady=10)
 
-    row_size = max(2, size)
+    row_size = max(3, size)
     labels = []     # reset labels for rows
 
     if winning_row == True:
@@ -130,18 +133,33 @@ def create_keyboard():
         row_frame = Frame(keyboard_frame)
         row_frame.pack()
         for key in row:
-            if current_os == 'macOS':   # mac settings
-                btn_width = 4 if key == "ENTER" else 2 if key == "⌫" else 1
+            if current_os == 'macOS':           # pixel sizes for tkmacosx
+                if key == "ENTER":
+                    w, h = 85, 50              # wide key
+                elif key == "⌫":
+                    w, h = 65, 50
+                else:
+                    w, h = 50, 50              # single-letter key
                 font_size = 24
-            else:   # windows settings
-                btn_width = 6 if key == "ENTER" else 4 if key == "⌫" else 3
+            else:                              # character units for regular Tk
+                w = 6 if key == "ENTER" else 4 if key == "⌫" else 3
+                h = 1
                 font_size = 18
-            btn = Button(
-                row_frame, text=key, width=btn_width, height=1, font=("Franklin Gothic Medium", font_size), cursor="hand2",
-                bg="#818384", fg="white" if current_os != 'macOS' else None, command=lambda k=key: on_virtual_key_press(k)
+
+            btn = KeyButton(
+                row_frame,
+                text=key,
+                width=w,
+                height=h,
+                font=("Franklin Gothic Medium", font_size),
+                cursor="hand2",
+                bg="#818384",
+                fg="white",
+                command=lambda k=key: on_virtual_key_press(k)
             )
             btn.pack(side="left", padx=2, pady=2)
-            btn_refs[key.lower()] = btn         # store btn reference
+            btn_refs[key.lower()] = btn
+
 
 # Event handling functions
 def on_key_press(event):
