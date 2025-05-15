@@ -33,7 +33,7 @@ length_to_dict = {
 # root window
 root = Tk()
 root.title("Wordle")
-root.geometry('600x700')
+root.geometry('600x800')
 
 # instructions 
 def show_instructions():
@@ -85,7 +85,7 @@ def create_definition_label():
 
 # Function to have the status label show only for a few seconds
 def show_message(msg, delay=3000):
-    status_label.config(text=msg)
+    status_label.config(text=msg, fg="red")
     root.after(delay, lambda: status_label.config(text=""))
 
 def show_definition(msg):
