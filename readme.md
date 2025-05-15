@@ -9,4 +9,13 @@ Every time you win a round, the word gets longer by 1 until reaching its max len
 
 Wordle can be run from the terminal under the command:
 
+## Requirements
+```python
+python: 3.9+
+
+# For full MacOS functionality
+PyObjC: 11.0
+tkmacosx: 1.0.5
+```
+
 - **python wordle.py**
